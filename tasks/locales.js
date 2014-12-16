@@ -252,6 +252,35 @@ module.exports = function (grunt) {
                     }
                 });
             });
+	    
+            var escapeRegex = /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g;
+
+            function mkAttrRegex(startDelim, endDelim) {
+                var start = startDelim.replace(escapeRegex, '\\$&');
+                var end = endDelim.replace(escapeRegex, '\\$&');
+
+                if (start === '' && end === '') {
+                    start = '^';
+                } else {
+                    // match optional :: (Angular 1.3's bind once syntax) without capturing
+                    start += '(?:\\s*\\:\\:\\s*)?';
+                }
+
+                var filters = '(' + attrs.join('|') + ')';
+                return new RegExp(start + '\\s*(\'|"|&quot;|&#39;)(.*?)\\1\\s*\\|\\s*' + filters + '\\s*(' + end + '|\\|)', 'g');
+            }
+
+            var re = mkAttrRegex("{{", "}}");
+            var matches;
+            while (matches = re.exec(str)) {
+                console.log(matches);
+                var key = matches[2].replace(/\\\'/g, '\'');
+                that.extendMessages(messages, key, {
+                            value: key,
+                            files: [file]
+                });
+            }
+
             callback.call(that);
         },
 
