@@ -273,7 +273,6 @@ module.exports = function (grunt) {
             var re = mkAttrRegex("{{", "}}");
             var matches;
             while (matches = re.exec(str)) {
-                console.log(matches);
                 var key = matches[2].replace(/\\\'/g, '\'');
                 that.extendMessages(messages, key, {
                             value: key,
